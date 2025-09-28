@@ -1,0 +1,518 @@
+{% extends 'core/base.html' %}
+
+{% block title %}MathEngine - Práctica de Aritmética{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2 text-primary">
+        <i class="fas fa-dumbbell"></i> Práctica de Aritmética
+    </h1>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+         Configuración de práctica 
+        <div class="card bg-dark border-primary mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-cog"></i> Configuración de Práctica
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="topicSelect" class="form-label">Tema:</label>
+                        <select class="form-select" id="topicSelect">
+                            <option value="">Todos los temas</option>
+                            <option value="fraction_operations">Operaciones con Fracciones</option>
+                            <option value="combined_operations">Operaciones Combinadas</option>
+                            <option value="mcm_mcd">MCM y MCD</option>
+                            <option value="factorization">Factorización</option>
+                            <option value="word_problems">Problemas Verbales</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="difficultySelect" class="form-label">Dificultad:</label>
+                        <select class="form-select" id="difficultySelect">
+                            <option value="easy">Fácil</option>
+                            <option value="medium" selected>Medio</option>
+                            <option value="hard">Difícil</option>
+                        </select>
+                    </div>
+                </div>
+                <button type="button" class="btn btn-primary" onclick="generateNewExercise()">
+                    <i class="fas fa-refresh"></i> Generar Nuevo Ejercicio
+                </button>
+            </div>
+        </div>
+        
+         Área del ejercicio 
+        <div id="exerciseArea" class="card bg-dark border-success" style="display: none;">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-pencil-alt"></i> Ejercicio
+                    <span id="exerciseCounter" class="badge bg-primary ms-2">1</span>
+                </h5>
+            </div>
+            <div class="card-body">
+                <div id="exerciseProblem" class="mb-4">
+                     El problema se cargará aquí 
+                </div>
+                
+                <div class="mb-3">
+                    <label for="userAnswer" class="form-label">Tu respuesta:</label>
+                    <input type="text" class="form-control form-control-lg" id="userAnswer" 
+                           placeholder="Ingresa tu respuesta aquí..." autocomplete="off">
+                    <div class="form-text">
+                        Para fracciones usa formato: 3/4 o 1 1/2 (número mixto)
+                    </div>
+                </div>
+                
+                <div class="d-flex gap-2">
+                    <button type="button" class="btn btn-success btn-lg" onclick="checkAnswer()">
+                        <i class="fas fa-check"></i> Verificar Respuesta
+                    </button>
+                    <button type="button" class="btn btn-secondary btn-lg" onclick="showHint()">
+                        <i class="fas fa-lightbulb"></i> Pista
+                    </button>
+                    <button type="button" class="btn btn-warning btn-lg" onclick="generateNewExercise()">
+                        <i class="fas fa-forward"></i> Siguiente
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+         Área de feedback 
+        <div id="feedbackArea" class="mt-4" style="display: none;">
+             El feedback se cargará aquí dinámicamente 
+        </div>
+        
+         Área de explicación dinámica 
+        <div id="explanationArea" class="mt-4" style="display: none;">
+            <div class="card bg-dark border-info">
+                <div class="card-header">
+                    <h5 class="mb-0 text-info">
+                        <i class="fas fa-info-circle"></i> Explicación
+                    </h5>
+                </div>
+                <div class="card-body" id="explanationContent">
+                     La explicación se cargará aquí 
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4">
+         Estadísticas de práctica 
+        <div class="card bg-dark border-info">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-chart-bar"></i> Estadísticas de Sesión
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-6">
+                        <div class="border-end">
+                            <h3 class="text-success" id="correctCount">0</h3>
+                            <small class="text-muted">Correctas</small>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <h3 class="text-danger" id="incorrectCount">0</h3>
+                        <small class="text-muted">Incorrectas</small>
+                    </div>
+                </div>
+                
+                <div class="mt-3">
+                    <div class="d-flex justify-content-between">
+                        <small>Precisión</small>
+                        <small id="accuracyPercent">0%</small>
+                    </div>
+                    <div class="progress">
+                        <div class="progress-bar bg-success" id="accuracyBar" style="width: 0%"></div>
+                    </div>
+                </div>
+                
+                <div class="mt-3">
+                    <small class="text-muted">
+                        <i class="fas fa-clock"></i> Tiempo de sesión: <span id="sessionTime">0:00</span>
+                    </small>
+                </div>
+            </div>
+        </div>
+        
+         Consejos y trucos 
+        <div class="card bg-dark border-warning mt-4">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-lightbulb"></i> Consejos
+                </h5>
+            </div>
+            <div class="card-body">
+                <div id="tipsCarousel" class="carousel slide" data-bs-ride="carousel">
+                    <div class="carousel-inner">
+                        <div class="carousel-item active">
+                            <p class="text-center">
+                                <i class="fas fa-check text-success"></i>
+                                Lee el problema completo antes de empezar a resolver.
+                            </p>
+                        </div>
+                        <div class="carousel-item">
+                            <p class="text-center">
+                                <i class="fas fa-check text-success"></i>
+                                Para fracciones, siempre simplifica al final.
+                            </p>
+                        </div>
+                        <div class="carousel-item">
+                            <p class="text-center">
+                                <i class="fas fa-check text-success"></i>
+                                En operaciones combinadas, respeta la jerarquía PEMDAS.
+                            </p>
+                        </div>
+                        <div class="carousel-item">
+                            <p class="text-center">
+                                <i class="fas fa-check text-success"></i>
+                                Si te equivocas, lee la explicación para entender el error.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+         Enlaces rápidos 
+        <div class="card bg-dark border-secondary mt-4">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-external-link-alt"></i> Enlaces Rápidos
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{% url 'arithmetic:theory' %}" class="btn btn-outline-info btn-sm">
+                        <i class="fas fa-book"></i> Revisar Teoría
+                    </a>
+                    <a href="{% url 'core:solver' %}" class="btn btn-outline-success btn-sm">
+                        <i class="fas fa-magic"></i> Usar Solucionador
+                    </a>
+                    <a href="{% url 'core:exam_setup' %}" class="btn btn-outline-danger btn-sm">
+                        <i class="fas fa-clipboard-check"></i> Hacer Examen
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+ Modal para mostrar solución paso a paso 
+<div class="modal fade" id="solutionModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content bg-dark">
+            <div class="modal-header border-secondary">
+                <h5 class="modal-title">
+                    <i class="fas fa-list-ol"></i> Solución Paso a Paso
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="solutionSteps">
+                 Los pasos se cargarán aquí 
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let currentExercise = null;
+let exerciseCount = 0;
+let correctAnswers = 0;
+let incorrectAnswers = 0;
+let sessionStartTime = Date.now();
+
+// Inicializar la práctica
+document.addEventListener('DOMContentLoaded', function() {
+    generateNewExercise();
+    updateSessionTimer();
+});
+
+function generateNewExercise() {
+    const topic = document.getElementById('topicSelect').value;
+    const difficulty = document.getElementById('difficultySelect').value;
+    
+    // Mostrar indicador de carga
+    const exerciseArea = document.getElementById('exerciseArea');
+    exerciseArea.style.display = 'block';
+    document.getElementById('exerciseProblem').innerHTML = '<div class="text-center"><i class="fas fa-spinner fa-spin"></i> Generando ejercicio...</div>';
+    
+    // Limpiar áreas de feedback
+    document.getElementById('feedbackArea').style.display = 'none';
+    document.getElementById('explanationArea').style.display = 'none';
+    document.getElementById('userAnswer').value = '';
+    
+    // Solicitar nuevo ejercicio
+    fetch('{% url "arithmetic:get_exercise" %}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: JSON.stringify({
+            topic: topic || null,
+            difficulty: difficulty
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            currentExercise = data.exercise;
+            displayExercise(currentExercise);
+            exerciseCount++;
+            document.getElementById('exerciseCounter').textContent = exerciseCount;
+        } else {
+            showError('Error generando ejercicio: ' + data.error);
+        }
+    })
+    .catch(error => {
+        showError('Error de conexión. Intenta nuevamente.');
+    });
+}
+
+function displayExercise(exercise) {
+    const problemDiv = document.getElementById('exerciseProblem');
+    
+    let problemHtml = `
+        <div class="exercise-problem">
+            <h5 class="text-info mb-3">
+                <i class="fas fa-question-circle"></i> 
+                ${getExerciseTypeTitle(exercise.type)}
+            </h5>
+            <div class="problem-statement">
+                ${exercise.problem}
+            </div>
+        </div>
+    `;
+    
+    problemDiv.innerHTML = problemHtml;
+    
+    // Re-renderizar MathJax
+    MathJax.typesetPromise();
+    
+    // Enfocar el campo de respuesta
+    document.getElementById('userAnswer').focus();
+}
+
+function getExerciseTypeTitle(type) {
+    const titles = {
+        'fraction_operations': 'Operaciones con Fracciones',
+        'combined_operations': 'Operaciones Combinadas',
+        'mcm_mcd': 'MCM y MCD',
+        'factorization': 'Factorización',
+        'word_problems': 'Problema Verbal'
+    };
+    return titles[type] || 'Ejercicio de Aritmética';
+}
+
+function checkAnswer() {
+    if (!currentExercise) {
+        showError('No hay ejercicio activo');
+        return;
+    }
+    
+    const userAnswer = document.getElementById('userAnswer').value.trim();
+    if (!userAnswer) {
+        showError('Por favor, ingresa una respuesta');
+        return;
+    }
+    
+    // Enviar respuesta para verificación
+    fetch('{% url "arithmetic:check_answer" %}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: JSON.stringify({
+            answer: userAnswer,
+            correct_answer: currentExercise.answer,
+            error_type: currentExercise.error_type
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            displayFeedback(data);
+            updateStatistics(data.is_correct);
+        } else {
+            showError('Error verificando respuesta: ' + data.error);
+        }
+    })
+    .catch(error => {
+        showError('Error de conexión. Intenta nuevamente.');
+    });
+}
+
+function displayFeedback(data) {
+    const feedbackArea = document.getElementById('feedbackArea');
+    
+    let feedbackHtml = '';
+    if (data.is_correct) {
+        feedbackHtml = `
+            <div class="alert alert-success" role="alert">
+                <i class="fas fa-check-circle"></i>
+                <strong>¡Correcto!</strong> ${data.message}
+                <div class="mt-2">
+                    <button class="btn btn-success btn-sm" onclick="generateNewExercise()">
+                        <i class="fas fa-forward"></i> Siguiente Ejercicio
+                    </button>
+                    <button class="btn btn-outline-success btn-sm ms-2" onclick="showSolutionSteps()">
+                        <i class="fas fa-list-ol"></i> Ver Pasos
+                    </button>
+                </div>
+            </div>
+        `;
+    } else {
+        feedbackHtml = `
+            <div class="alert alert-danger" role="alert">
+                <i class="fas fa-times-circle"></i>
+                <strong>Incorrecto.</strong> ${data.message}
+                <div class="mt-2">
+                    <strong>Respuesta correcta:</strong> ${data.correct_answer}
+                </div>
+                <div class="mt-2">
+                    <button class="btn btn-warning btn-sm" onclick="showExplanation('${data.explanation}')">
+                        <i class="fas fa-info-circle"></i> Ver Explicación
+                    </button>
+                    <button class="btn btn-outline-danger btn-sm ms-2" onclick="showSolutionSteps()">
+                        <i class="fas fa-list-ol"></i> Ver Pasos
+                    </button>
+                </div>
+            </div>
+        `;
+    }
+    
+    feedbackArea.innerHTML = feedbackHtml;
+    feedbackArea.style.display = 'block';
+}
+
+function showExplanation(explanation) {
+    const explanationArea = document.getElementById('explanationArea');
+    const explanationContent = document.getElementById('explanationContent');
+    
+    explanationContent.innerHTML = explanation;
+    explanationArea.style.display = 'block';
+    
+    // Re-renderizar MathJax
+    MathJax.typesetPromise();
+}
+
+function showSolutionSteps() {
+    if (!currentExercise || !currentExercise.solution_steps) {
+        showError('No hay pasos de solución disponibles');
+        return;
+    }
+    
+    const stepsHtml = currentExercise.solution_steps.map((step, index) => 
+        `<div class="step mb-3">
+            <h6 class="text-info">Paso ${index + 1}:</h6>
+            <p>${step}</p>
+        </div>`
+    ).join('');
+    
+    document.getElementById('solutionSteps').innerHTML = stepsHtml;
+    
+    const modal = new bootstrap.Modal(document.getElementById('solutionModal'));
+    modal.show();
+    
+    // Re-renderizar MathJax después de mostrar el modal
+    setTimeout(() => MathJax.typesetPromise(), 300);
+}
+
+function showHint() {
+    if (!currentExercise) return;
+    
+    const hints = {
+        'fraction_operations': 'Recuerda encontrar un denominador común para sumar o restar fracciones.',
+        'combined_operations': 'Aplica la jerarquía PEMDAS: Paréntesis, Exponentes, Multiplicación/División, Suma/Resta.',
+        'mcm_mcd': 'Factoriza ambos números en primos y aplica las reglas del MCM y MCD.',
+        'factorization': 'Divide el número por primos empezando por 2, luego 3, 5, 7, etc.',
+        'word_problems': 'Identifica qué operación necesitas y traduce el problema a matemáticas.'
+    };
+    
+    const hint = hints[currentExercise.type] || 'Lee el problema cuidadosamente e identifica qué se te pide.';
+    
+    const alertDiv = document.createElement('div');
+    alertDiv.className = 'alert alert-info alert-dismissible fade show mt-3';
+    alertDiv.innerHTML = `
+        <i class="fas fa-lightbulb"></i>
+        <strong>Pista:</strong> ${hint}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    
+    document.getElementById('exerciseArea').appendChild(alertDiv);
+}
+
+function updateStatistics(isCorrect) {
+    if (isCorrect) {
+        correctAnswers++;
+    } else {
+        incorrectAnswers++;
+    }
+    
+    document.getElementById('correctCount').textContent = correctAnswers;
+    document.getElementById('incorrectCount').textContent = incorrectAnswers;
+    
+    const total = correctAnswers + incorrectAnswers;
+    const accuracy = total > 0 ? Math.round((correctAnswers / total) * 100) : 0;
+    
+    document.getElementById('accuracyPercent').textContent = accuracy + '%';
+    document.getElementById('accuracyBar').style.width = accuracy + '%';
+}
+
+function updateSessionTimer() {
+    setInterval(() => {
+        const elapsed = Math.floor((Date.now() - sessionStartTime) / 1000);
+        const minutes = Math.floor(elapsed / 60);
+        const seconds = elapsed % 60;
+        document.getElementById('sessionTime').textContent = 
+            `${minutes}:${seconds.toString().padStart(2, '0')}`;
+    }, 1000);
+}
+
+function showError(message) {
+    const alertDiv = document.createElement('div');
+    alertDiv.className = 'alert alert-danger alert-dismissible fade show';
+    alertDiv.innerHTML = `
+        <i class="fas fa-exclamation-triangle"></i>
+        <strong>Error:</strong> ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    
+    document.querySelector('.container-fluid').insertBefore(alertDiv, document.querySelector('main').firstChild);
+}
+
+// Permitir envío con Enter
+document.getElementById('userAnswer').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        checkAnswer();
+    }
+});
+
+// Función auxiliar para obtener el token CSRF
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+</script>
+{% endblock %}

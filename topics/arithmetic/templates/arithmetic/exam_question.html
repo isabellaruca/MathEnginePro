@@ -1,0 +1,26 @@
+{% extends 'core/base.html' %}
+
+{% block title %}MathEngine - Pregunta de Examen{% endblock %}
+
+{% block content %}
+<div class="card bg-dark border-primary">
+    <div class="card-header">
+        <h5 class="mb-0">
+            <i class="fas fa-question-circle"></i> Pregunta de Examen
+        </h5>
+    </div>
+    <div class="card-body">
+        <div class="exercise-problem mb-4">
+            {{ exercise.problem|safe }}
+        </div>
+        
+        <div class="mb-3">
+            <label for="examAnswer" class="form-label">Tu respuesta:</label>
+            <input type="text" class="form-control" id="examAnswer" name="answer" required>
+        </div>
+        
+        <input type="hidden" id="correctAnswer" value="{{ exercise.answer }}">
+        <input type="hidden" id="exerciseType" value="{{ exercise.type }}">
+    </div>
+</div>
+{% endblock %}

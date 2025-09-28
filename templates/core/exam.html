@@ -1,0 +1,274 @@
+{% extends 'base.html' %}
+
+{% block title %}Examen - MathEngine{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
+                    <i class="fas fa-clipboard-check me-2"></i>
+                    Examen en Progreso
+                </h5>
+                <div class="d-flex align-items-center gap-3">
+                    <div class="badge bg-primary fs-6">
+                        Pregunta <span id="currentQuestion">1</span> de {{ config.num_questions }}
+                    </div>
+                    <div class="badge bg-warning fs-6" id="timer">
+                        <i class="fas fa-clock me-1"></i>
+                        <span id="timeRemaining">{{ config.time_limit }}:00</span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="progress mb-4">
+                    <div class="progress-bar" role="progressbar" style="width: 10%" id="progressBar"></div>
+                </div>
+                
+                <div id="questionContainer">
+                    <div class="mb-4">
+                        <h6>Pregunta 1:</h6>
+                        <div class="math-display">
+                            $$\text{Resuelve: } 2x + 5 = 13$$
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Tu respuesta:</label>
+                                <input type="text" class="form-control math-input" id="answerInput" placeholder="Ingresa tu respuesta...">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between">
+                        <button class="btn btn-outline-secondary" id="prevBtn" disabled>
+                            <i class="fas fa-arrow-left me-2"></i>Anterior
+                        </button>
+                        <button class="btn btn-primary" id="nextBtn">
+                            Siguiente<i class="fas fa-arrow-right ms-2"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div id="examComplete" style="display: none;">
+                    <div class="text-center">
+                        <i class="fas fa-check-circle fa-4x text-success mb-3"></i>
+                        <h3>¡Examen Completado!</h3>
+                        <p class="lead">Has terminado el examen exitosamente.</p>
+                        <div class="row mt-4">
+                            <div class="col-md-4">
+                                <div class="card bg-primary bg-opacity-10">
+                                    <div class="card-body text-center">
+                                        <h4 class="text-primary" id="finalScore">85%</h4>
+                                        <p class="mb-0">Puntuación Final</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card bg-success bg-opacity-10">
+                                    <div class="card-body text-center">
+                                        <h4 class="text-success" id="correctAnswers">8/10</h4>
+                                        <p class="mb-0">Respuestas Correctas</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card bg-info bg-opacity-10">
+                                    <div class="card-body text-center">
+                                        <h4 class="text-info" id="timeUsed">25:30</h4>
+                                        <p class="mb-0">Tiempo Utilizado</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-4">
+                            <a href="{% url 'core:exam_setup' %}" class="btn btn-primary me-2">Nuevo Examen</a>
+                            <a href="{% url 'core:index' %}" class="btn btn-outline-secondary">Volver al Inicio</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let currentQuestionIndex = 0;
+let totalQuestions = {{ config.num_questions }};
+let timeLimit = {{ config.time_limit }} * 60; // Convert to seconds
+let timeRemaining = timeLimit;
+let timerInterval;
+let answers = [];
+
+// Sample questions (in a real app, these would come from the backend)
+const questions = [
+    {
+        question: "Resuelve: $2x + 5 = 13$",
+        answer: "4",
+        type: "equation"
+    },
+    {
+        question: "Calcula: $\\frac{3}{4} + \\frac{1}{6}$",
+        answer: "11/12",
+        type: "fraction"
+    },
+    {
+        question: "Encuentra el MCD de 24 y 36",
+        answer: "12",
+        type: "number"
+    }
+];
+
+function startTimer() {
+    timerInterval = setInterval(() => {
+        timeRemaining--;
+        updateTimerDisplay();
+        
+        if (timeRemaining <= 0) {
+            finishExam();
+        }
+    }, 1000);
+}
+
+function updateTimerDisplay() {
+    const minutes = Math.floor(timeRemaining / 60);
+    const seconds = timeRemaining % 60;
+    document.getElementById('timeRemaining').textContent = 
+        `${minutes}:${seconds.toString().padStart(2, '0')}`;
+    
+    // Change color when time is running low
+    const timerElement = document.getElementById('timer');
+    if (timeRemaining < 300) { // Less than 5 minutes
+        timerElement.className = 'badge bg-danger fs-6';
+    } else if (timeRemaining < 600) { // Less than 10 minutes
+        timerElement.className = 'badge bg-warning fs-6';
+    }
+}
+
+function updateProgress() {
+    const progress = ((currentQuestionIndex + 1) / totalQuestions) * 100;
+    document.getElementById('progressBar').style.width = progress + '%';
+    document.getElementById('currentQuestion').textContent = currentQuestionIndex + 1;
+}
+
+function loadQuestion() {
+    const question = questions[currentQuestionIndex % questions.length];
+    const questionContainer = document.getElementById('questionContainer');
+    
+    questionContainer.innerHTML = `
+        <div class="mb-4">
+            <h6>Pregunta ${currentQuestionIndex + 1}:</h6>
+            <div class="math-display">
+                ${question.question}
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label class="form-label">Tu respuesta:</label>
+                    <input type="text" class="form-control math-input" id="answerInput" 
+                           placeholder="Ingresa tu respuesta..." value="${answers[currentQuestionIndex] || ''}">
+                </div>
+            </div>
+        </div>
+        
+        <div class="d-flex justify-content-between">
+            <button class="btn btn-outline-secondary" id="prevBtn" onclick="previousQuestion()" 
+                    ${currentQuestionIndex === 0 ? 'disabled' : ''}>
+                <i class="fas fa-arrow-left me-2"></i>Anterior
+            </button>
+            <button class="btn btn-primary" id="nextBtn" onclick="nextQuestion()">
+                ${currentQuestionIndex === totalQuestions - 1 ? 'Finalizar Examen' : 'Siguiente'}
+                <i class="fas fa-arrow-right ms-2"></i>
+            </button>
+        </div>
+    `;
+    
+    // Re-render MathJax
+    if (window.MathJax) {
+        MathJax.typesetPromise([questionContainer]);
+    }
+    
+    updateProgress();
+}
+
+function saveCurrentAnswer() {
+    const answerInput = document.getElementById('answerInput');
+    if (answerInput) {
+        answers[currentQuestionIndex] = answerInput.value;
+    }
+}
+
+function nextQuestion() {
+    saveCurrentAnswer();
+    
+    if (currentQuestionIndex === totalQuestions - 1) {
+        finishExam();
+    } else {
+        currentQuestionIndex++;
+        loadQuestion();
+    }
+}
+
+function previousQuestion() {
+    saveCurrentAnswer();
+    
+    if (currentQuestionIndex > 0) {
+        currentQuestionIndex--;
+        loadQuestion();
+    }
+}
+
+function finishExam() {
+    clearInterval(timerInterval);
+    saveCurrentAnswer();
+    
+    // Calculate results
+    let correctAnswers = 0;
+    const totalAnswered = answers.filter(a => a && a.trim()).length;
+    
+    // Simple scoring (in a real app, this would be more sophisticated)
+    correctAnswers = Math.floor(totalAnswered * 0.8); // Assume 80% correct for demo
+    
+    const score = Math.round((correctAnswers / totalQuestions) * 100);
+    const timeUsed = timeLimit - timeRemaining;
+    const timeUsedMinutes = Math.floor(timeUsed / 60);
+    const timeUsedSeconds = timeUsed % 60;
+    
+    // Update results
+    document.getElementById('finalScore').textContent = score + '%';
+    document.getElementById('correctAnswers').textContent = `${correctAnswers}/${totalQuestions}`;
+    document.getElementById('timeUsed').textContent = 
+        `${timeUsedMinutes}:${timeUsedSeconds.toString().padStart(2, '0')}`;
+    
+    // Show results
+    document.getElementById('questionContainer').style.display = 'none';
+    document.getElementById('examComplete').style.display = 'block';
+}
+
+// Initialize exam
+document.addEventListener('DOMContentLoaded', function() {
+    loadQuestion();
+    startTimer();
+    
+    // Auto-save answers when typing
+    document.addEventListener('input', function(e) {
+        if (e.target.id === 'answerInput') {
+            saveCurrentAnswer();
+        }
+    });
+    
+    // Prevent accidental page refresh
+    window.addEventListener('beforeunload', function(e) {
+        e.preventDefault();
+        e.returnValue = '';
+    });
+});
+</script>
+{% endblock %}

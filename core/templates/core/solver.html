@@ -1,0 +1,247 @@
+{% extends 'core/base.html' %}
+
+{% block title %}MathEngine - Solucionador{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2 text-primary">
+        <i class="fas fa-magic"></i> Solucionador Matemático
+    </h1>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card bg-dark border-primary">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-calculator"></i> Ingresa tu expresión matemática
+                </h5>
+            </div>
+            <div class="card-body">
+                <form id="solverForm">
+                    <div class="mb-3">
+                        <label for="expression" class="form-label">Expresión:</label>
+                        <input type="text" class="form-control form-control-lg" id="expression" 
+                               placeholder="Ej: (x+1)*(x+2), factor(x**2-4), solve(2*x+3=7, x)" 
+                               autocomplete="off">
+                        <div class="form-text">
+                            Usa sintaxis de Python/SymPy. Ejemplos: x**2 (potencia), sqrt(x) (raíz), sin(x) (seno)
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="fas fa-play"></i> Resolver
+                    </button>
+                    <button type="button" class="btn btn-secondary btn-lg ms-2" onclick="clearSolution()">
+                        <i class="fas fa-eraser"></i> Limpiar
+                    </button>
+                </form>
+            </div>
+        </div>
+        
+         Área de resultados 
+        <div id="solutionArea" class="mt-4" style="display: none;">
+            <div class="card bg-dark border-success">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-check-circle text-success"></i> Solución Paso a Paso
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div id="originalExpression" class="mb-3">
+                        <strong>Expresión original:</strong>
+                        <div class="math-display mt-2"></div>
+                    </div>
+                    
+                    <div id="solutionSteps">
+                         Los pasos se cargarán aquí dinámicamente 
+                    </div>
+                    
+                    <div id="finalResult" class="mt-4 p-3 bg-success bg-opacity-10 border border-success rounded">
+                        <strong class="text-success">Resultado final:</strong>
+                        <div class="math-display mt-2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+         Área de error 
+        <div id="errorArea" class="mt-4" style="display: none;">
+            <div class="alert alert-danger" role="alert">
+                <i class="fas fa-exclamation-triangle"></i>
+                <strong>Error:</strong> <span id="errorMessage"></span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4">
+        <div class="card bg-dark border-info">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-info-circle"></i> Ejemplos de Uso
+                </h5>
+            </div>
+            <div class="card-body">
+                <h6 class="text-info">Álgebra Básica:</h6>
+                <ul class="list-unstyled">
+                    <li><code>expand((x+1)*(x+2))</code></li>
+                    <li><code>factor(x**2 + 3*x + 2)</code></li>
+                    <li><code>simplify(x**2/x)</code></li>
+                </ul>
+                
+                <h6 class="text-info mt-3">Ecuaciones:</h6>
+                <ul class="list-unstyled">
+                    <li><code>solve(2*x + 3 - 7, x)</code></li>
+                    <li><code>solve(x**2 - 4, x)</code></li>
+                </ul>
+                
+                <h6 class="text-info mt-3">Cálculo:</h6>
+                <ul class="list-unstyled">
+                    <li><code>diff(x**2, x)</code></li>
+                    <li><code>integrate(x**2, x)</code></li>
+                </ul>
+                
+                <h6 class="text-info mt-3">Trigonometría:</h6>
+                <ul class="list-unstyled">
+                    <li><code>sin(pi/2)</code></li>
+                    <li><code>cos(0)</code></li>
+                    <li><code>simplify(sin(x)**2 + cos(x)**2)</code></li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="card bg-dark border-warning mt-4">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-lightbulb"></i> Consejos
+                </h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled">
+                    <li><i class="fas fa-check text-success"></i> Usa ** para potencias (x**2)</li>
+                    <li><i class="fas fa-check text-success"></i> Usa sqrt() para raíces cuadradas</li>
+                    <li><i class="fas fa-check text-success"></i> Usa pi para π y E para e</li>
+                    <li><i class="fas fa-check text-success"></i> Usa paréntesis para agrupar términos</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.getElementById('solverForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const expression = document.getElementById('expression').value.trim();
+    if (!expression) {
+        showError('Por favor, ingresa una expresión matemática.');
+        return;
+    }
+    
+    // Mostrar indicador de carga
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    const originalText = submitBtn.innerHTML;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Resolviendo...';
+    submitBtn.disabled = true;
+    
+    // Ocultar áreas de resultado y error
+    document.getElementById('solutionArea').style.display = 'none';
+    document.getElementById('errorArea').style.display = 'none';
+    
+    // Enviar solicitud al servidor
+    fetch('{% url "core:solve_expression" %}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: JSON.stringify({
+            expression: expression
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showSolution(data);
+        } else {
+            showError(data.error);
+        }
+    })
+    .catch(error => {
+        showError('Error de conexión. Por favor, intenta nuevamente.');
+    })
+    .finally(() => {
+        // Restaurar botón
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+    });
+});
+
+function showSolution(data) {
+    // Mostrar expresión original
+    document.querySelector('#originalExpression .math-display').innerHTML = '$$' + data.original + '$$';
+    
+    // Mostrar pasos
+    const stepsContainer = document.getElementById('solutionSteps');
+    stepsContainer.innerHTML = '';
+    
+    if (data.steps && data.steps.length > 0) {
+        data.steps.forEach((step, index) => {
+            const stepDiv = document.createElement('div');
+            stepDiv.className = 'step mb-3 p-3 bg-info bg-opacity-10 border border-info rounded';
+            stepDiv.innerHTML = `
+                <h6 class="text-info">Paso ${index + 1}: ${step.description}</h6>
+                <div class="math-display">$$${step.expression}$$</div>
+                <small class="text-muted">${step.explanation}</small>
+            `;
+            stepsContainer.appendChild(stepDiv);
+        });
+    }
+    
+    // Mostrar resultado final
+    document.querySelector('#finalResult .math-display').innerHTML = '$$' + data.result + '$$';
+    
+    // Mostrar área de solución
+    document.getElementById('solutionArea').style.display = 'block';
+    
+    // Re-renderizar MathJax
+    MathJax.typesetPromise();
+}
+
+function showError(message) {
+    document.getElementById('errorMessage').textContent = message;
+    document.getElementById('errorArea').style.display = 'block';
+}
+
+function clearSolution() {
+    document.getElementById('expression').value = '';
+    document.getElementById('solutionArea').style.display = 'none';
+    document.getElementById('errorArea').style.display = 'none';
+}
+
+// Función auxiliar para obtener el token CSRF
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+// Ejemplos clickeables
+document.querySelectorAll('code').forEach(code => {
+    code.style.cursor = 'pointer';
+    code.addEventListener('click', function() {
+        document.getElementById('expression').value = this.textContent;
+    });
+});
+</script>
+{% endblock %}

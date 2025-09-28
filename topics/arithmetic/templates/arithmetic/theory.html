@@ -1,0 +1,161 @@
+{% extends 'core/base.html' %}
+
+{% block title %}MathEngine - Teoría de Aritmética{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2 text-primary">
+        <i class="fas fa-book"></i> {{ content.title }}
+    </h1>
+</div>
+
+<div class="row">
+    <div class="col-lg-9">
+        <div class="card bg-dark border-primary mb-4">
+            <div class="card-body">
+                <h3 class="card-title text-primary">{{ content.title }}</h3>
+                <p class="card-text lead">{{ content.description }}</p>
+            </div>
+        </div>
+        
+        {% for section in content.sections %}
+        <div class="card bg-dark border-secondary mb-4" id="section-{{ section.id }}">
+            <div class="card-header">
+                <h4 class="mb-0">
+                    <button class="btn btn-link text-decoration-none text-white" 
+                            type="button" data-bs-toggle="collapse" 
+                            data-bs-target="#collapse-{{ section.id }}" 
+                            aria-expanded="true">
+                        <i class="fas fa-chevron-down"></i> {{ section.title }}
+                    </button>
+                </h4>
+            </div>
+            
+            <div id="collapse-{{ section.id }}" class="collapse show">
+                <div class="card-body">
+                    {{ section.content|safe }}
+                    
+                    {% if section.examples %}
+                    <div class="mt-4">
+                        <h5 class="text-info">
+                            <i class="fas fa-lightbulb"></i> Ejemplos
+                        </h5>
+                        
+                        {% for example in section.examples %}
+                        <div class="card bg-dark border-info mt-3">
+                            <div class="card-header">
+                                <h6 class="mb-0 text-info">{{ example.title }}</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <strong>Problema:</strong>
+                                    <div class="mt-2">{{ example.problem|safe }}</div>
+                                </div>
+                                
+                                <div class="accordion" id="solution-{{ forloop.parentloop.counter }}-{{ forloop.counter }}">
+                                    <div class="accordion-item bg-dark border-success">
+                                        <h6 class="accordion-header">
+                                            <button class="accordion-button collapsed bg-dark text-white border-0" 
+                                                    type="button" data-bs-toggle="collapse" 
+                                                    data-bs-target="#solution-content-{{ forloop.parentloop.counter }}-{{ forloop.counter }}">
+                                                <i class="fas fa-eye text-success me-2"></i> Ver Solución
+                                            </button>
+                                        </h6>
+                                        <div id="solution-content-{{ forloop.parentloop.counter }}-{{ forloop.counter }}" 
+                                             class="accordion-collapse collapse">
+                                            <div class="accordion-body">
+                                                {{ example.solution|safe }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <div class="col-lg-3">
+        <div class="card bg-dark border-info sticky-top">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-list"></i> Índice de Contenidos
+                </h5>
+            </div>
+            <div class="card-body">
+                <nav class="nav flex-column">
+                    {% for section in content.sections %}
+                    <a class="nav-link text-info" href="#section-{{ section.id }}">
+                        <i class="fas fa-arrow-right"></i> {{ section.title }}
+                    </a>
+                    {% endfor %}
+                </nav>
+            </div>
+        </div>
+        
+        <div class="card bg-dark border-warning mt-4">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-dumbbell"></i> ¿Listo para Practicar?
+                </h5>
+            </div>
+            <div class="card-body text-center">
+                <p>Pon a prueba tus conocimientos con ejercicios interactivos.</p>
+                <a href="{% url 'arithmetic:practice' %}" class="btn btn-warning">
+                    <i class="fas fa-play"></i> Ir a Práctica
+                </a>
+            </div>
+        </div>
+        
+        <div class="card bg-dark border-success mt-4">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-calculator"></i> Herramientas
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{% url 'core:solver' %}" class="btn btn-outline-success btn-sm">
+                        <i class="fas fa-magic"></i> Solucionador
+                    </a>
+                    <a href="{% url 'core:exam_setup' %}" class="btn btn-outline-danger btn-sm">
+                        <i class="fas fa-clipboard-check"></i> Examen
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Smooth scrolling para los enlaces del índice
+document.querySelectorAll('a[href^="#section-"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+            target.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
+        }
+    });
+});
+
+// Re-renderizar MathJax cuando se abren las secciones
+document.querySelectorAll('[data-bs-toggle="collapse"]').forEach(button => {
+    button.addEventListener('click', function() {
+        setTimeout(() => {
+            MathJax.typesetPromise();
+        }, 300);
+    });
+});
+</script>
+{% endblock %}

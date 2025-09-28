@@ -1,0 +1,452 @@
+{% extends 'base.html' %}
+
+{% block title %}Solucionador - MathEngine{% endblock %}
+
+{% block extra_css %}
+<style>
+    .math-button {
+        min-width: 50px;
+        min-height: 50px;
+        font-size: 1.2rem;
+        margin: 2px;
+        border-radius: 8px;
+        background: var(--dark-surface);
+        border: 1px solid var(--border-color);
+        color: var(--text-primary);
+        transition: all 0.2s ease;
+    }
+    
+    .math-button:hover {
+        background: var(--dark-surface-hover);
+        transform: translateY(-1px);
+    }
+    
+    .math-input-display {
+        background: var(--dark-bg);
+        border: 2px solid var(--border-color);
+        border-radius: 12px;
+        padding: 1rem;
+        font-size: 1.3rem;
+        min-height: 80px;
+        font-family: 'Courier New', monospace;
+    }
+    
+    .math-keyboard {
+        background: var(--dark-surface);
+        border-radius: 12px;
+        padding: 1rem;
+        border: 1px solid var(--border-color);
+    }
+    
+    .solution-step {
+        background: rgba(37, 99, 235, 0.1);
+        border-left: 4px solid var(--primary-color);
+        border-radius: 0 8px 8px 0;
+        padding: 1rem;
+        margin: 1rem 0;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="mb-4">
+            <i class="fas fa-calculator me-2" style="color: var(--primary-color);"></i>
+            Solucionador Matemático
+        </h1>
+        <p class="lead text-secondary mb-4">
+            Ingresa tu expresión matemática usando los botones o escribiendo directamente
+        </p>
+    </div>
+</div>
+
+<div class="row">
+     Input Section 
+    <div class="col-lg-8">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Expresión Matemática</h5>
+            </div>
+            <div class="card-body">
+                 Math Input Display 
+                <div class="math-input-display mb-3" id="mathDisplay">
+                    <span id="mathExpression"></span>
+                    <span class="cursor">|</span>
+                </div>
+                
+                 Math Keyboard 
+                <div class="math-keyboard">
+                    <div class="row g-1 mb-2">
+                        <div class="col">
+                            <h6 class="text-secondary mb-2">Números y Operaciones Básicas</h6>
+                        </div>
+                    </div>
+                    <div class="row g-1 mb-3">
+                        <div class="col-auto">
+                            <button class="math-button" onclick="addToExpression('7')">7</button>
+                        </div>
+                        <div class="col-auto">
+                            <button class="math-button" onclick="addToExpression('8')">8</button>
+                        </div>
+                        <div class="col-auto">
+                            <button class="math-button" onclick="addToExpression('9')">9</button>
+                        </div>
+                        <div class="col-auto">
+                            <button class="math-button" onclick="addToExpression('/')" title="División">÷</button>
+                        </div>
+                        <div class="col-auto">
+                            <button class="math-button" onclick="addToExpression('(')">(</button>
+                        </div>
+                        <div class="col-auto">
+                            <button class="math-button" onclick="addToExpression(')')">)</button>
+                        </div>
+                    </div>
+                    <div class="row g-1 mb-3">
+                        <div class="col-auto">
+                            <button class="math-button" onclick="addToExpression('4')">4</button>
+                        </div>
+                        <div class="col-auto">
+                            <button class="math-button" onclick="addToExpression('5')">5</button>
+                        </div>
+                        <div class="col-auto">
+                            <button class="math-button" onclick="addToExpression('6')">6</button>
+                        </div>
+                        <div class="col-auto">
+                            <button class="math-button" onclick="addToExpression('*')" title="Multiplicación">×</button>
+                        </div>
+                        <div class="col-auto">
+                            <button class="math-button" onclick="addToExpression('x')">x</button>
+                        </div>
+                        <div class="col-auto">
+                            <button class="math-button" onclick="addToExpression('y')">y</button>
+                        </div>
+                    </div>
+                    <div class="row g-1 mb-3">
+                        <div class="col-auto">
+                            <button class="math-button" onclick="addToExpression('1')">1</button>
+                        </div>
+                        <div class="col-auto">
+                            <button class="math-button" onclick="addToExpression('2')">2</button>
+                        </div>
+                        <div class="col-auto">
+                            <button class="math-button" onclick="addToExpression('3')">3</button>
+                        </div>
+                        <div class="col-auto">
+                            <button class="math-button" onclick="addToExpression('-')" title="Resta">−</button>
+                        </div>
+                        <div class="col-auto">
+                            <button class="math-button" onclick="addToExpression('^')" title="Potencia">x²</button>
+                        </div>
+                        <div class="col-auto">
+                            <button class="math-button" onclick="addToExpression('sqrt(')" title="Raíz cuadrada">√</button>
+                        </div>
+                    </div>
+                    <div class="row g-1 mb-3">
+                        <div class="col-auto">
+                            <button class="math-button" onclick="addToExpression('0')">0</button>
+                        </div>
+                        <div class="col-auto">
+                            <button class="math-button" onclick="addToExpression('.')">.</button>
+                        </div>
+                        <div class="col-auto">
+                            <button class="math-button" onclick="addToExpression('=')">=</button>
+                        </div>
+                        <div class="col-auto">
+                            <button class="math-button" onclick="addToExpression('+')" title="Suma">+</button>
+                        </div>
+                        <div class="col-auto">
+                            <button class="math-button btn-warning" onclick="clearExpression()">C</button>
+                        </div>
+                        <div class="col-auto">
+                            <button class="math-button btn-danger" onclick="backspace()">⌫</button>
+                        </div>
+                    </div>
+                    
+                    <div class="row g-1 mb-2">
+                        <div class="col">
+                            <h6 class="text-secondary mb-2">Funciones Avanzadas</h6>
+                        </div>
+                    </div>
+                    <div class="row g-1 mb-3">
+                        <div class="col-auto">
+                            <button class="math-button" onclick="addToExpression('sin(')" title="Seno">sin</button>
+                        </div>
+                        <div class="col-auto">
+                            <button class="math-button" onclick="addToExpression('cos(')" title="Coseno">cos</button>
+                        </div>
+                        <div class="col-auto">
+                            <button class="math-button" onclick="addToExpression('tan(')" title="Tangente">tan</button>
+                        </div>
+                        <div class="col-auto">
+                            <button class="math-button" onclick="addToExpression('log(')" title="Logaritmo">log</button>
+                        </div>
+                        <div class="col-auto">
+                            <button class="math-button" onclick="addToExpression('ln(')" title="Logaritmo natural">ln</button>
+                        </div>
+                        <div class="col-auto">
+                            <button class="math-button" onclick="addToExpression('pi')" title="Pi">π</button>
+                        </div>
+                    </div>
+                    
+                    <div class="row g-1">
+                        <div class="col-auto">
+                            <button class="math-button" onclick="addToExpression('integrate(')" title="Integral">∫</button>
+                        </div>
+                        <div class="col-auto">
+                            <button class="math-button" onclick="addToExpression('diff(')" title="Derivada">d/dx</button>
+                        </div>
+                        <div class="col-auto">
+                            <button class="math-button" onclick="addToExpression('limit(')" title="Límite">lim</button>
+                        </div>
+                        <div class="col-auto">
+                            <button class="math-button" onclick="addToExpression('sum(')" title="Sumatoria">Σ</button>
+                        </div>
+                        <div class="col-auto">
+                            <button class="math-button" onclick="addToExpression('factorial(')" title="Factorial">n!</button>
+                        </div>
+                        <div class="col-auto">
+                            <button class="math-button" onclick="addToExpression('abs(')" title="Valor absoluto">|x|</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="d-flex gap-2 mt-3">
+                    <button class="btn btn-primary flex-grow-1" onclick="solveExpression()" id="solveBtn">
+                        <i class="fas fa-play me-2"></i>Resolver
+                    </button>
+                    <button class="btn btn-outline-secondary" onclick="clearAll()">
+                        <i class="fas fa-trash me-2"></i>Limpiar Todo
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+     Help Section 
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Ayuda</h5>
+            </div>
+            <div class="card-body">
+                <h6>Ejemplos de uso:</h6>
+                <ul class="list-unstyled">
+                    <li class="mb-2">
+                        <code>2*x + 5 = 13</code><br>
+                        <small class="text-secondary">Ecuación lineal</small>
+                    </li>
+                    <li class="mb-2">
+                        <code>x^2 - 4*x + 4</code><br>
+                        <small class="text-secondary">Expresión cuadrática</small>
+                    </li>
+                    <li class="mb-2">
+                        <code>sin(pi/4)</code><br>
+                        <small class="text-secondary">Función trigonométrica</small>
+                    </li>
+                    <li class="mb-2">
+                        <code>integrate(x^2, x)</code><br>
+                        <small class="text-secondary">Integral indefinida</small>
+                    </li>
+                </ul>
+                
+                <h6 class="mt-3">Símbolos especiales:</h6>
+                <ul class="list-unstyled">
+                    <li><code>pi</code> - π (3.14159...)</li>
+                    <li><code>e</code> - e (2.71828...)</li>
+                    <li><code>sqrt(x)</code> - √x</li>
+                    <li><code>x^2</code> - x²</li>
+                    <li><code>abs(x)</code> - |x|</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+ Solution Section 
+<div class="row mt-4" id="solutionSection" style="display: none;">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-lightbulb me-2" style="color: var(--warning-color);"></i>
+                    Solución Paso a Paso
+                </h5>
+            </div>
+            <div class="card-body" id="solutionContent">
+                 Solution steps will be inserted here 
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let currentExpression = '';
+
+function addToExpression(value) {
+    currentExpression += value;
+    updateDisplay();
+}
+
+function clearExpression() {
+    currentExpression = '';
+    updateDisplay();
+}
+
+function backspace() {
+    currentExpression = currentExpression.slice(0, -1);
+    updateDisplay();
+}
+
+function clearAll() {
+    currentExpression = '';
+    updateDisplay();
+    document.getElementById('solutionSection').style.display = 'none';
+}
+
+function updateDisplay() {
+    document.getElementById('mathExpression').textContent = currentExpression || 'Ingresa tu expresión...';
+    // Re-render MathJax if needed
+    if (window.MathJax) {
+        MathJax.typesetPromise([document.getElementById('mathDisplay')]);
+    }
+}
+
+function solveExpression() {
+    if (!currentExpression.trim()) {
+        alert('Por favor ingresa una expresión matemática');
+        return;
+    }
+    
+    const solveBtn = document.getElementById('solveBtn');
+    const originalText = solveBtn.innerHTML;
+    
+    // Show loading state
+    solveBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Resolviendo...';
+    solveBtn.disabled = true;
+    
+    // Send request to solve
+    fetch('{% url "core:solve_expression" %}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: JSON.stringify({
+            expression: currentExpression
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        displaySolution(data);
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error al resolver la expresión');
+    })
+    .finally(() => {
+        // Restore button state
+        solveBtn.innerHTML = originalText;
+        solveBtn.disabled = false;
+    });
+}
+
+function displaySolution(data) {
+    const solutionSection = document.getElementById('solutionSection');
+    const solutionContent = document.getElementById('solutionContent');
+    
+    if (data.error) {
+        solutionContent.innerHTML = `
+            <div class="alert alert-danger">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                ${data.error}
+            </div>
+        `;
+    } else {
+        let html = `
+            <div class="mb-4">
+                <h6>Expresión original:</h6>
+                <div class="math-display">$$${data.original}$$</div>
+            </div>
+        `;
+        
+        if (data.steps && data.steps.length > 0) {
+            html += '<h6>Pasos de solución:</h6>';
+            data.steps.forEach((step, index) => {
+                html += `
+                    <div class="solution-step fade-in">
+                        <div class="d-flex align-items-start">
+                            <div class="badge bg-primary me-3 mt-1">${index + 1}</div>
+                            <div class="flex-grow-1">
+                                <h6 class="mb-2">${step.description}</h6>
+                                <div class="math-display">$$${step.expression}$$</div>
+                                <p class="text-secondary mb-0">${step.explanation}</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+        
+        html += `
+            <div class="mt-4 p-3 bg-success bg-opacity-10 border border-success rounded">
+                <h6 class="text-success mb-2">
+                    <i class="fas fa-check-circle me-2"></i>Resultado final:
+                </h6>
+                <div class="math-display">$$${data.result}$$</div>
+            </div>
+        `;
+        
+        solutionContent.innerHTML = html;
+        
+        // Re-render MathJax
+        if (window.MathJax) {
+            MathJax.typesetPromise([solutionContent]);
+        }
+    }
+    
+    solutionSection.style.display = 'block';
+    solutionSection.scrollIntoView({ behavior: 'smooth' });
+}
+
+// Helper function to get CSRF token
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+// Initialize display
+updateDisplay();
+
+// Allow keyboard input
+document.addEventListener('keydown', function(event) {
+    const key = event.key;
+    
+    if (key >= '0' && key <= '9') {
+        addToExpression(key);
+    } else if (['+', '-', '*', '/', '(', ')', '.', '='].includes(key)) {
+        addToExpression(key);
+    } else if (key === 'Enter') {
+        event.preventDefault();
+        solveExpression();
+    } else if (key === 'Backspace') {
+        event.preventDefault();
+        backspace();
+    } else if (key === 'Escape') {
+        clearExpression();
+    }
+});
+</script>
+{% endblock %}

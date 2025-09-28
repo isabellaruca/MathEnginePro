@@ -1,0 +1,188 @@
+{% extends 'base.html' %}
+
+{% block title %}MathEngine - Inicio{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="text-center mb-5">
+            <h1 class="display-4 fw-bold mb-3">
+                Bienvenido a <span style="color: var(--primary-color);">MathEngine</span>
+            </h1>
+            <p class="lead text-secondary">
+                Plataforma integral para el aprendizaje de matemáticas para ingeniería
+            </p>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+     Solucionador 
+    <div class="col-md-6 col-lg-3">
+        <div class="card h-100 text-center">
+            <div class="card-body d-flex flex-column">
+                <div class="mb-3">
+                    <i class="fas fa-calculator fa-3x" style="color: var(--primary-color);"></i>
+                </div>
+                <h5 class="card-title">Solucionador</h5>
+                <p class="card-text flex-grow-1">
+                    Resuelve expresiones matemáticas paso a paso con explicaciones detalladas
+                </p>
+                <a href="{% url 'core:solver' %}" class="btn btn-primary">
+                    Resolver Problemas
+                </a>
+            </div>
+        </div>
+    </div>
+
+     Teoría - Aritmética 
+    <div class="col-md-6 col-lg-3">
+        <div class="card h-100 text-center">
+            <div class="card-body d-flex flex-column">
+                <div class="mb-3">
+                    <i class="fas fa-book fa-3x" style="color: var(--success-color);"></i>
+                </div>
+                <h5 class="card-title">Aritmética</h5>
+                <p class="card-text flex-grow-1">
+                    Fundamentos de aritmética: conjuntos numéricos, operaciones y fracciones
+                </p>
+                <div class="d-flex gap-2">
+                    <a href="{% url 'arithmetic:theory' %}" class="btn btn-outline-primary btn-sm flex-grow-1">
+                        Teoría
+                    </a>
+                    <a href="{% url 'arithmetic:practice' %}" class="btn btn-primary btn-sm flex-grow-1">
+                        Práctica
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+     Teoría - Álgebra 
+    <div class="col-md-6 col-lg-3">
+        <div class="card h-100 text-center">
+            <div class="card-body d-flex flex-column">
+                <div class="mb-3">
+                    <i class="fas fa-square-root-alt fa-3x" style="color: var(--accent-purple);"></i>
+                </div>
+                <h5 class="card-title">Álgebra</h5>
+                <p class="card-text flex-grow-1">
+                    Monomios, polinomios, productos notables y factorización
+                </p>
+                <div class="d-flex gap-2">
+                    <a href="{% url 'algebra:theory' %}" class="btn btn-outline-primary btn-sm flex-grow-1">
+                        Teoría
+                    </a>
+                    <a href="{% url 'algebra:practice' %}" class="btn btn-primary btn-sm flex-grow-1">
+                        Práctica
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+     Examen 
+    <div class="col-md-6 col-lg-3">
+        <div class="card h-100 text-center">
+            <div class="card-body d-flex flex-column">
+                <div class="mb-3">
+                    <i class="fas fa-clipboard-check fa-3x" style="color: var(--danger-color);"></i>
+                </div>
+                <h5 class="card-title">Examen</h5>
+                <p class="card-text flex-grow-1">
+                    Evaluaciones personalizables con límite de tiempo y resultados detallados
+                </p>
+                <a href="{% url 'core:exam_setup' %}" class="btn btn-outline-primary">
+                    Crear Examen
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+ Features Section 
+<div class="row mt-5">
+    <div class="col-12">
+        <h2 class="text-center mb-4">Características Principales</h2>
+    </div>
+    <div class="col-md-4 text-center mb-4">
+        <i class="fas fa-infinity fa-2x mb-3" style="color: var(--primary-color);"></i>
+        <h5>Ejercicios Infinitos</h5>
+        <p class="text-secondary">Generación algorítmica de problemas únicos para práctica ilimitada</p>
+    </div>
+    <div class="col-md-4 text-center mb-4">
+        <i class="fas fa-route fa-2x mb-3" style="color: var(--success-color);"></i>
+        <h5>Solución Paso a Paso</h5>
+        <p class="text-secondary">Explicaciones detalladas de cada paso del proceso de resolución</p>
+    </div>
+    <div class="col-md-4 text-center mb-4">
+        <i class="fas fa-chart-line fa-2x mb-3" style="color: var(--warning-color);"></i>
+        <h5>Seguimiento de Progreso</h5>
+        <p class="text-secondary">Estadísticas detalladas de rendimiento y áreas de mejora</p>
+    </div>
+</div>
+
+ Quick Access Section 
+<div class="row mt-5">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0">
+                    <i class="fas fa-rocket me-2" style="color: var(--accent-blue);"></i>
+                    Acceso Rápido
+                </h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Temas de Estudio:</h6>
+                        <ul class="list-unstyled">
+                            <li class="mb-2">
+                                <a href="{% url 'arithmetic:theory' %}#conjuntos_numericos" class="text-decoration-none">
+                                    <i class="fas fa-circle-dot me-2 text-primary"></i>
+                                    Conjuntos Numéricos
+                                </a>
+                            </li>
+                            <li class="mb-2">
+                                <a href="{% url 'arithmetic:theory' %}#fracciones" class="text-decoration-none">
+                                    <i class="fas fa-circle-dot me-2 text-primary"></i>
+                                    Operaciones con Fracciones
+                                </a>
+                            </li>
+                            <li class="mb-2">
+                                <a href="{% url 'algebra:theory' %}#monomios" class="text-decoration-none">
+                                    <i class="fas fa-circle-dot me-2 text-primary"></i>
+                                    Monomios y Polinomios
+                                </a>
+                            </li>
+                            <li class="mb-2">
+                                <a href="{% url 'algebra:theory' %}#productos_notables" class="text-decoration-none">
+                                    <i class="fas fa-circle-dot me-2 text-primary"></i>
+                                    Productos Notables
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Herramientas:</h6>
+                        <div class="d-grid gap-2">
+                            <a href="{% url 'core:solver' %}" class="btn btn-outline-primary btn-sm">
+                                <i class="fas fa-calculator me-2"></i>
+                                Calculadora Simbólica
+                            </a>
+                            <a href="{% url 'arithmetic:practice' %}" class="btn btn-outline-success btn-sm">
+                                <i class="fas fa-dumbbell me-2"></i>
+                                Práctica de Aritmética
+                            </a>
+                            <a href="{% url 'algebra:practice' %}" class="btn btn-outline-info btn-sm">
+                                <i class="fas fa-square-root-alt me-2"></i>
+                                Práctica de Álgebra
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

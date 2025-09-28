@@ -1,0 +1,153 @@
+{% extends 'core/base.html' %}
+
+{% block title %}MathEngine - Inicio{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2 text-primary">
+        <i class="fas fa-home"></i> Bienvenido a MathEngine
+    </h1>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card bg-dark border-primary mb-4">
+            <div class="card-body">
+                <h3 class="card-title text-primary">
+                    <i class="fas fa-rocket"></i> Tu Navaja Suiza Matemática
+                </h3>
+                <p class="card-text lead">
+                    MathEngine es una plataforma interactiva diseñada para estudiantes de ingeniería que buscan 
+                    dominar conceptos matemáticos de manera práctica y eficiente.
+                </p>
+                <p class="card-text">
+                    Explora nuestros módulos especializados para resolver problemas, aprender teoría, 
+                    practicar con ejercicios infinitos y evaluar tu progreso con exámenes personalizados.
+                </p>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-6 mb-4">
+                <div class="card h-100 bg-dark border-success">
+                    <div class="card-body text-center">
+                        <i class="fas fa-magic fa-3x text-success mb-3"></i>
+                        <h5 class="card-title">Solucionador</h5>
+                        <p class="card-text">
+                            Resuelve cualquier expresión matemática con pasos detallados, 
+                            al estilo WolframAlpha.
+                        </p>
+                        <a href="{% url 'core:solver' %}" class="btn btn-success">
+                            <i class="fas fa-arrow-right"></i> Comenzar
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 mb-4">
+                <div class="card h-100 bg-dark border-info">
+                    <div class="card-body text-center">
+                        <i class="fas fa-book fa-3x text-info mb-3"></i>
+                        <h5 class="card-title">Teoría</h5>
+                        <p class="card-text">
+                            Accede a contenido teórico estructurado con ejemplos 
+                            y fórmulas renderizadas profesionalmente.
+                        </p>
+                        <a href="{% url 'arithmetic:theory' %}" class="btn btn-info">
+                            <i class="fas fa-arrow-right"></i> Explorar
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 mb-4">
+                <div class="card h-100 bg-dark border-warning">
+                    <div class="card-body text-center">
+                        <i class="fas fa-dumbbell fa-3x text-warning mb-3"></i>
+                        <h5 class="card-title">Práctica</h5>
+                        <p class="card-text">
+                            Ejercicios infinitos generados algorítmicamente con 
+                            feedback instantáneo y explicaciones dinámicas.
+                        </p>
+                        <a href="{% url 'arithmetic:practice' %}" class="btn btn-warning">
+                            <i class="fas fa-arrow-right"></i> Practicar
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 mb-4">
+                <div class="card h-100 bg-dark border-danger">
+                    <div class="card-body text-center">
+                        <i class="fas fa-clipboard-check fa-3x text-danger mb-3"></i>
+                        <h5 class="card-title">Examen</h5>
+                        <p class="card-text">
+                            Evalúa tu progreso con exámenes personalizables 
+                            y obtén resultados detallados.
+                        </p>
+                        <a href="{% url 'core:exam_setup' %}" class="btn btn-danger">
+                            <i class="fas fa-arrow-right"></i> Evaluar
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4">
+        <div class="card bg-dark border-secondary">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-lightbulb text-warning"></i> Consejo del Día
+                </h5>
+            </div>
+            <div class="card-body">
+                <p class="card-text">
+                    <strong>¿Sabías que...?</strong> La práctica regular de 15-20 minutos diarios 
+                    es más efectiva que sesiones largas esporádicas para dominar conceptos matemáticos.
+                </p>
+                <small class="text-muted">
+                    <i class="fas fa-clock"></i> Actualizado diariamente
+                </small>
+            </div>
+        </div>
+        
+        <div class="card bg-dark border-secondary mt-4">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-chart-line text-primary"></i> Tu Progreso
+                </h5>
+            </div>
+            <div class="card-body">
+                <p class="text-muted">Inicia sesión para ver tu progreso personalizado</p>
+                <div class="progress mb-2">
+                    <div class="progress-bar bg-success" role="progressbar" style="width: 0%"></div>
+                </div>
+                <small class="text-muted">0% completado</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+ Fórmula destacada del día 
+<div class="row mt-5">
+    <div class="col-12">
+        <div class="card bg-dark border-primary">
+            <div class="card-header text-center">
+                <h5 class="mb-0">
+                    <i class="fas fa-star text-warning"></i> Fórmula Destacada
+                </h5>
+            </div>
+            <div class="card-body text-center">
+                <h4>Identidad de Euler</h4>
+                <div class="my-4">
+                    $$e^{i\pi} + 1 = 0$$
+                </div>
+                <p class="text-muted">
+                    Una de las fórmulas más elegantes de las matemáticas, que conecta cinco constantes fundamentales.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

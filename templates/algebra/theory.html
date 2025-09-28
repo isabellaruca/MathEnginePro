@@ -1,0 +1,120 @@
+{% extends 'base.html' %}
+
+{% block title %}Teoría de Álgebra - MathEngine{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="mb-4">
+            <i class="fas fa-square-root-alt me-2" style="color: var(--accent-purple);"></i>
+            {{ content.title }}
+        </h1>
+        <p class="lead text-secondary mb-4">{{ content.description }}</p>
+    </div>
+</div>
+
+ Navigation tabs for sections 
+<div class="row mb-4">
+    <div class="col-12">
+        <ul class="nav nav-pills nav-fill" id="theoryTabs" role="tablist">
+            {% for section in content.sections %}
+            <li class="nav-item" role="presentation">
+                <button class="nav-link {% if forloop.first %}active{% endif %}" 
+                        id="{{ section.id }}-tab" 
+                        data-bs-toggle="pill" 
+                        data-bs-target="#{{ section.id }}" 
+                        type="button" 
+                        role="tab">
+                    {{ section.title }}
+                </button>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+
+ Theory content 
+<div class="tab-content" id="theoryTabsContent">
+    {% for section in content.sections %}
+    <div class="tab-pane fade {% if forloop.first %}show active{% endif %}" 
+         id="{{ section.id }}" 
+         role="tabpanel" 
+         aria-labelledby="{{ section.id }}-tab">
+        
+        <div class="theory-section">
+            <h2 class="mb-4">{{ section.title }}</h2>
+            
+             Theory content 
+            <div class="theory-content mb-4">
+                {{ section.content|safe }}
+            </div>
+            
+             Examples 
+            {% if section.examples %}
+            <h4 class="mt-5 mb-3">
+                <i class="fas fa-lightbulb me-2" style="color: var(--warning-color);"></i>
+                Ejemplos Resueltos
+            </h4>
+            
+            {% for example in section.examples %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">{{ example.title }}</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <h6>Problema:</h6>
+                        <div class="math-display">{{ example.problem|safe }}</div>
+                    </div>
+                    
+                    <div>
+                        <h6>Solución:</h6>
+                        <div class="solution-content">{{ example.solution|safe }}</div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+ Practice button 
+<div class="row mt-5">
+    <div class="col-12 text-center">
+        <a href="{% url 'algebra:practice' %}" class="btn btn-primary btn-lg">
+            <i class="fas fa-dumbbell me-2"></i>
+            Practicar Álgebra
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Re-render MathJax when switching tabs
+document.addEventListener('DOMContentLoaded', function() {
+    const tabButtons = document.querySelectorAll('#theoryTabs button[data-bs-toggle="pill"]');
+    
+    tabButtons.forEach(button => {
+        button.addEventListener('shown.bs.tab', function(event) {
+            // Re-render MathJax for the active tab
+            const targetPane = document.querySelector(event.target.getAttribute('data-bs-target'));
+            if (window.MathJax && targetPane) {
+                MathJax.typesetPromise([targetPane]).then(() => {
+                    console.log('MathJax re-rendered for tab:', event.target.textContent);
+                });
+            }
+        });
+    });
+    
+    // Initial MathJax render
+    if (window.MathJax) {
+        MathJax.typesetPromise().then(() => {
+            console.log('Initial MathJax render complete');
+        });
+    }
+});
+</script>
+{% endblock %}

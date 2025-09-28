@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="es" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}MathEngine - Plataforma Matemática Interactiva{% endblock %}</title>
+    
+     Bootstrap 5 CSS 
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+     Google Fonts 
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    
+     Font Awesome Icons 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+     MathJax for LaTeX rendering 
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\$$', '\$$']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    
+     Custom CSS 
+    <link rel="stylesheet" href="{% load static %}{% static 'css/custom_styles.css' %}">
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+             Sidebar 
+            <nav class="col-md-3 col-lg-2 d-md-block bg-dark sidebar collapse">
+                <div class="position-sticky pt-3">
+                    <div class="text-center mb-4">
+                        <h3 class="text-primary">
+                            <i class="fas fa-calculator"></i> MathEngine
+                        </h3>
+                        <p class="text-muted small">Plataforma Matemática Interactiva</p>
+                    </div>
+                    
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'index' %}active{% endif %}" 
+                               href="{% url 'core:index' %}">
+                                <i class="fas fa-home"></i> Inicio
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'solver' %}active{% endif %}" 
+                               href="{% url 'core:solver' %}">
+                                <i class="fas fa-magic"></i> Solucionador
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" data-bs-toggle="collapse" data-bs-target="#theorySubmenu">
+                                <i class="fas fa-book"></i> Teoría
+                                <i class="fas fa-chevron-down float-end"></i>
+                            </a>
+                            <div class="collapse" id="theorySubmenu">
+                                <ul class="nav flex-column ms-3">
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="{% url 'arithmetic:theory' %}">
+                                            <i class="fas fa-plus"></i> Aritmética
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" data-bs-toggle="collapse" data-bs-target="#practiceSubmenu">
+                                <i class="fas fa-dumbbell"></i> Práctica
+                                <i class="fas fa-chevron-down float-end"></i>
+                            </a>
+                            <div class="collapse" id="practiceSubmenu">
+                                <ul class="nav flex-column ms-3">
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="{% url 'arithmetic:practice' %}">
+                                            <i class="fas fa-plus"></i> Aritmética
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if 'exam' in request.resolver_match.url_name %}active{% endif %}" 
+                               href="{% url 'core:exam_setup' %}">
+                                <i class="fas fa-clipboard-check"></i> Examen
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+            
+             Main content 
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+                <div class="pt-3 pb-2 mb-3">
+                    {% block content %}{% endblock %}
+                </div>
+            </main>
+        </div>
+    </div>
+    
+     Bootstrap 5 JS 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+     HTMX for dynamic interactions 
+    <script src="https://unpkg.com/htmx.org@1.9.6"></script>
+    
+     Chart.js for graphics 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+     Custom JavaScript 
+    <script src="{% load static %}{% static 'js/main.js' %}"></script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,470 @@
+{% extends 'base.html' %}
+
+{% block title %}Práctica de Álgebra - MathEngine{% endblock %}
+
+{% block extra_css %}
+<style>
+    .exercise-card {
+        min-height: 300px;
+        transition: all 0.3s ease;
+    }
+    
+    .difficulty-badge {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+    }
+    
+    .stats-card {
+        background: linear-gradient(135deg, var(--primary-color), var(--accent-blue));
+        color: white;
+        border: none;
+    }
+    
+    .topic-selector {
+        background: var(--dark-surface);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        padding: 1rem;
+    }
+    
+    .answer-input {
+        font-size: 1.2rem;
+        text-align: center;
+        background: var(--dark-bg);
+        border: 2px solid var(--border-color);
+        color: var(--text-primary);
+    }
+    
+    .answer-input:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 0.2rem rgba(37, 99, 235, 0.25);
+    }
+    
+    .feedback-correct {
+        background: rgba(16, 185, 129, 0.1);
+        border-left: 4px solid var(--success-color);
+        color: var(--success-color);
+    }
+    
+    .feedback-incorrect {
+        background: rgba(239, 68, 68, 0.1);
+        border-left: 4px solid var(--danger-color);
+        color: var(--danger-color);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="mb-4">
+            <i class="fas fa-dumbbell me-2" style="color: var(--accent-purple);"></i>
+            Práctica de Álgebra
+        </h1>
+        <p class="lead text-secondary mb-4">
+            Resuelve ejercicios de álgebra y mejora tus habilidades paso a paso
+        </p>
+    </div>
+</div>
+
+<div class="row">
+     Exercise Section 
+    <div class="col-lg-8">
+         Topic and Difficulty Selection 
+        <div class="topic-selector mb-4">
+            <div class="row">
+                <div class="col-md-6">
+                    <label for="topicSelect" class="form-label">Tema:</label>
+                    <select class="form-select" id="topicSelect">
+                        <option value="">Todos los temas</option>
+                        <option value="monomios">Monomios</option>
+                        <option value="polinomios">Polinomios</option>
+                        <option value="productos_notables">Productos Notables</option>
+                        <option value="factorizacion">Factorización</option>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label for="difficultySelect" class="form-label">Dificultad:</label>
+                    <select class="form-select" id="difficultySelect">
+                        <option value="easy">Fácil</option>
+                        <option value="medium" selected>Medio</option>
+                        <option value="hard">Difícil</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        
+         Exercise Card 
+        <div class="card exercise-card position-relative" id="exerciseCard">
+            <span class="badge difficulty-badge" id="difficultyBadge">Medio</span>
+            <div class="card-header">
+                <h5 class="mb-0" id="exerciseTitle">Cargando ejercicio...</h5>
+            </div>
+            <div class="card-body">
+                <div id="exerciseContent">
+                    <div class="text-center">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Cargando...</span>
+                        </div>
+                        <p class="mt-2">Generando ejercicio...</p>
+                    </div>
+                </div>
+                
+                 Answer Section 
+                <div id="answerSection" style="display: none;">
+                    <hr>
+                    <div class="row">
+                        <div class="col-md-8">
+                            <label for="answerInput" class="form-label">Tu respuesta:</label>
+                            <input type="text" class="form-control answer-input" id="answerInput" 
+                                   placeholder="Ingresa tu respuesta aquí...">
+                        </div>
+                        <div class="col-md-4 d-flex align-items-end">
+                            <button class="btn btn-primary w-100" id="checkAnswerBtn">
+                                <i class="fas fa-check me-2"></i>Verificar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                 Feedback Section 
+                <div id="feedbackSection" style="display: none;">
+                    <hr>
+                    <div id="feedbackContent"></div>
+                    <div class="mt-3">
+                        <button class="btn btn-outline-primary me-2" id="showSolutionBtn">
+                            <i class="fas fa-lightbulb me-2"></i>Ver Solución
+                        </button>
+                        <button class="btn btn-primary" id="nextExerciseBtn">
+                            <i class="fas fa-arrow-right me-2"></i>Siguiente Ejercicio
+                        </button>
+                    </div>
+                </div>
+                
+                 Solution Section 
+                <div id="solutionSection" style="display: none;">
+                    <hr>
+                    <h6><i class="fas fa-graduation-cap me-2"></i>Solución Paso a Paso:</h6>
+                    <div id="solutionContent"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+     Stats and Help Section 
+    <div class="col-lg-4">
+         Statistics 
+        <div class="card stats-card mb-4">
+            <div class="card-body text-center">
+                <h5 class="card-title">
+                    <i class="fas fa-chart-line me-2"></i>Estadísticas
+                </h5>
+                <div class="row">
+                    <div class="col-6">
+                        <h3 id="correctCount">0</h3>
+                        <small>Correctas</small>
+                    </div>
+                    <div class="col-6">
+                        <h3 id="totalCount">0</h3>
+                        <small>Total</small>
+                    </div>
+                </div>
+                <div class="mt-2">
+                    <small>Precisión: <span id="accuracyPercent">0%</span></small>
+                </div>
+            </div>
+        </div>
+        
+         Help Card 
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-question-circle me-2"></i>Ayuda
+                </h5>
+            </div>
+            <div class="card-body">
+                <h6>Consejos para resolver:</h6>
+                <ul class="list-unstyled">
+                    <li class="mb-2">
+                        <i class="fas fa-check-circle text-success me-2"></i>
+                        Lee el problema cuidadosamente
+                    </li>
+                    <li class="mb-2">
+                        <i class="fas fa-check-circle text-success me-2"></i>
+                        Identifica el tipo de operación
+                    </li>
+                    <li class="mb-2">
+                        <i class="fas fa-check-circle text-success me-2"></i>
+                        Aplica las reglas correspondientes
+                    </li>
+                    <li class="mb-2">
+                        <i class="fas fa-check-circle text-success me-2"></i>
+                        Verifica tu respuesta
+                    </li>
+                </ul>
+                
+                <h6 class="mt-3">Notación:</h6>
+                <ul class="list-unstyled small">
+                    <li><code>x^2</code> - x al cuadrado</li>
+                    <li><code>2*x</code> - 2 por x</li>
+                    <li><code>(x+1)</code> - usar paréntesis</li>
+                    <li><code>-3*x</code> - coeficiente negativo</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let currentExercise = null;
+let stats = {
+    correct: 0,
+    total: 0
+};
+
+// Load stats from localStorage
+function loadStats() {
+    const savedStats = localStorage.getItem('algebraStats');
+    if (savedStats) {
+        stats = JSON.parse(savedStats);
+        updateStatsDisplay();
+    }
+}
+
+// Save stats to localStorage
+function saveStats() {
+    localStorage.setItem('algebraStats', JSON.stringify(stats));
+}
+
+// Update stats display
+function updateStatsDisplay() {
+    document.getElementById('correctCount').textContent = stats.correct;
+    document.getElementById('totalCount').textContent = stats.total;
+    const accuracy = stats.total > 0 ? Math.round((stats.correct / stats.total) * 100) : 0;
+    document.getElementById('accuracyPercent').textContent = accuracy + '%';
+}
+
+// Get new exercise
+function getNewExercise() {
+    const topic = document.getElementById('topicSelect').value;
+    const difficulty = document.getElementById('difficultySelect').value;
+    
+    // Show loading
+    document.getElementById('exerciseContent').innerHTML = `
+        <div class="text-center">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Cargando...</span>
+            </div>
+            <p class="mt-2">Generando ejercicio...</p>
+        </div>
+    `;
+    
+    // Hide sections
+    document.getElementById('answerSection').style.display = 'none';
+    document.getElementById('feedbackSection').style.display = 'none';
+    document.getElementById('solutionSection').style.display = 'none';
+    
+    // Update difficulty badge
+    const badges = {
+        'easy': { text: 'Fácil', class: 'bg-success' },
+        'medium': { text: 'Medio', class: 'bg-warning' },
+        'hard': { text: 'Difícil', class: 'bg-danger' }
+    };
+    const badge = document.getElementById('difficultyBadge');
+    badge.textContent = badges[difficulty].text;
+    badge.className = `badge difficulty-badge ${badges[difficulty].class}`;
+    
+    // Fetch exercise
+    fetch('{% url "algebra:get_exercise" %}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: JSON.stringify({
+            topic: topic,
+            difficulty: difficulty
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            currentExercise = data.exercise;
+            displayExercise();
+        } else {
+            showError('Error al cargar el ejercicio: ' + data.error);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showError('Error de conexión');
+    });
+}
+
+// Display exercise
+function displayExercise() {
+    if (!currentExercise) return;
+    
+    document.getElementById('exerciseTitle').textContent = 
+        currentExercise.type.replace('_', ' ').toUpperCase();
+    
+    document.getElementById('exerciseContent').innerHTML = `
+        <div class="math-display">
+            ${currentExercise.problem}
+        </div>
+    `;
+    
+    // Show answer section
+    document.getElementById('answerSection').style.display = 'block';
+    document.getElementById('answerInput').value = '';
+    document.getElementById('answerInput').focus();
+    
+    // Re-render MathJax
+    if (window.MathJax) {
+        MathJax.typesetPromise([document.getElementById('exerciseContent')]);
+    }
+}
+
+// Check answer
+function checkAnswer() {
+    const userAnswer = document.getElementById('answerInput').value.trim();
+    
+    if (!userAnswer) {
+        alert('Por favor ingresa una respuesta');
+        return;
+    }
+    
+    if (!currentExercise) {
+        alert('No hay ejercicio cargado');
+        return;
+    }
+    
+    // Update stats
+    stats.total++;
+    
+    // Simple answer checking (in a real app, this would be more sophisticated)
+    const isCorrect = normalizeAnswer(userAnswer) === normalizeAnswer(currentExercise.answer);
+    
+    if (isCorrect) {
+        stats.correct++;
+    }
+    
+    saveStats();
+    updateStatsDisplay();
+    
+    // Show feedback
+    showFeedback(isCorrect);
+}
+
+// Normalize answer for comparison
+function normalizeAnswer(answer) {
+    return answer.replace(/\s+/g, '').toLowerCase()
+                 .replace(/\*/g, '')
+                 .replace(/\^/g, '**');
+}
+
+// Show feedback
+function showFeedback(isCorrect) {
+    const feedbackSection = document.getElementById('feedbackSection');
+    const feedbackContent = document.getElementById('feedbackContent');
+    
+    if (isCorrect) {
+        feedbackContent.innerHTML = `
+            <div class="alert feedback-correct">
+                <i class="fas fa-check-circle me-2"></i>
+                <strong>¡Correcto!</strong> Excelente trabajo.
+            </div>
+        `;
+    } else {
+        feedbackContent.innerHTML = `
+            <div class="alert feedback-incorrect">
+                <i class="fas fa-times-circle me-2"></i>
+                <strong>Incorrecto.</strong> La respuesta correcta es: <code>${currentExercise.answer}</code>
+            </div>
+        `;
+    }
+    
+    feedbackSection.style.display = 'block';
+    
+    // Hide answer section
+    document.getElementById('answerSection').style.display = 'none';
+}
+
+// Show solution
+function showSolution() {
+    if (!currentExercise || !currentExercise.solution_steps) return;
+    
+    const solutionContent = document.getElementById('solutionContent');
+    let html = '<ol>';
+    
+    currentExercise.solution_steps.forEach(step => {
+        html += `<li class="mb-2">${step}</li>`;
+    });
+    
+    html += '</ol>';
+    solutionContent.innerHTML = html;
+    
+    document.getElementById('solutionSection').style.display = 'block';
+    
+    // Re-render MathJax
+    if (window.MathJax) {
+        MathJax.typesetPromise([solutionContent]);
+    }
+}
+
+// Show error
+function showError(message) {
+    document.getElementById('exerciseContent').innerHTML = `
+        <div class="alert alert-danger">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            ${message}
+        </div>
+    `;
+}
+
+// Helper function to get CSRF token
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+// Event listeners
+document.addEventListener('DOMContentLoaded', function() {
+    loadStats();
+    getNewExercise();
+    
+    // Topic/difficulty change
+    document.getElementById('topicSelect').addEventListener('change', getNewExercise);
+    document.getElementById('difficultySelect').addEventListener('change', getNewExercise);
+    
+    // Check answer
+    document.getElementById('checkAnswerBtn').addEventListener('click', checkAnswer);
+    
+    // Show solution
+    document.getElementById('showSolutionBtn').addEventListener('click', showSolution);
+    
+    // Next exercise
+    document.getElementById('nextExerciseBtn').addEventListener('click', getNewExercise);
+    
+    // Enter key to check answer
+    document.getElementById('answerInput').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            checkAnswer();
+        }
+    });
+});
+</script>
+{% endblock %}
