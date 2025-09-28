@@ -727,11 +727,15 @@ def show_exam_setup():
     
     # Resumen de configuración
     st.markdown("### 📋 Resumen:")
+    
+    difficulty_text = {'easy': 'Fácil', 'medium': 'Medio', 'hard': 'Difícil'}[difficulty]
+    topics_text = ', '.join([{'arithmetic': 'Aritmética', 'algebra': 'Álgebra'}[t] for t in topics])
+    
     st.info(f"""
-    - **Temas:** {', '.join([{'arithmetic': 'Aritmética', 'algebra': 'Álgebra'}[t] for t in topics])}
+    - **Temas:** {topics_text}
     - **Preguntas:** {num_questions}
     - **Tiempo:** {time_limit} minutos
-    - **Dificultad:** {{'easy': 'Fácil', 'medium': 'Medio', 'hard': 'Difícil'}[difficulty]}
+    - **Dificultad:** {difficulty_text}
     """)
     
     if st.button("🚀 Comenzar Examen", type="primary", disabled=not topics):
